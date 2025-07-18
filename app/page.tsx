@@ -153,8 +153,66 @@ export default function HomePage() {
 
   const handleOpenFullPreview = async (code: string, frameName?: string, files?: Array<{ name: string; content: string; type: string }>) => {
     try {
-      console.log('🚀 Opening full preview in dedicated page...');
-      console.log('🚀 Original code:', code.substring(0, 500));
+      console.log('🚀 Opening MCP preview...');
+      
+      // Determine component name from code or use default
+      const componentMatch = code.match(/(?:function|const)\s+([A-Za-z][A-Za-z0-9]*)/)
+      const componentName = componentMatch?.[1] || 'GeneratedComponent';
+      
+      // Use the frame name for consistent naming
+      const targetFrameName = frameName || selectedFrames[0]?.name || 'default';
+      
+      // Try MCP preview first
+      const mcpResponse = await fetch('/api/mcp-preview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          tool: 'render_component_preview',
+          arguments: {
+            code: code,
+            componentName: componentName,
+            framework: 'react',
+            styling: options.styling,
+            files: files || []
+          }
+        }),
+      });
+
+      if (mcpResponse.ok) {
+        const mcpResult = await mcpResponse.json();
+        console.log('🚀 MCP Preview Result:', mcpResult);
+        
+        if (mcpResult.success && mcpResult.focusedPrompt) {
+          // Show the focused prompt to the user
+          const shouldProceed = window.confirm(`MCP Preview Ready! 
+
+This will open Claude Desktop with an optimized prompt designed to handle context limitations.
+
+Preview ID: ${mcpResult.previewId}
+Chunks: ${mcpResult.chunks} parts
+Component: ${componentName}
+
+The prompt is specifically designed to work with Claude Desktop's token limits and handles the "continue" scenarios automatically.
+
+Click OK to copy the prompt to clipboard and proceed with Claude Desktop.`);
+          
+          if (shouldProceed) {
+            // Copy the focused prompt to clipboard
+            await navigator.clipboard.writeText(mcpResult.focusedPrompt);
+            setSuccess(`MCP preview prompt copied to clipboard! Paste it in Claude Desktop to generate a stable preview.`);
+            
+            // Also log it for easy access
+            console.log('🚀 Focused Prompt for Claude Desktop:');
+            console.log(mcpResult.focusedPrompt);
+          }
+          return;
+        }
+      }
+      
+      // Fallback to original preview system
+      console.log('🚀 MCP preview failed, falling back to internal system...');
       
       // Minimal cleaning - just remove HTML artifacts but preserve JSX
       const cleanCode = code
@@ -163,14 +221,7 @@ export default function HomePage() {
         .replace(/style="[^"]*"/g, '') // Remove inline styles
         .trim();
       
-      console.log('🚀 Cleaned code:', cleanCode.substring(0, 500));
-      
-      // Determine component name from code or use default
-      const componentMatch = cleanCode.match(/(?:function|const)\s+([A-Za-z][A-Za-z0-9]*)/)
-      const componentName = componentMatch?.[1] || 'GeneratedComponent';
-      
       // Use the frame name for consistent URL routing
-      const targetFrameName = frameName || selectedFrames[0]?.name || 'default';
       const normalizedFrameName = targetFrameName.toLowerCase().replace(/\s+/g, '-');
       
       // Send to internal preview API
@@ -182,7 +233,7 @@ export default function HomePage() {
         body: JSON.stringify({
           componentName,
           code: cleanCode,
-          frameName: normalizedFrameName, // Store with normalized name
+          frameName: normalizedFrameName,
           files: files || []
         }),
       });
@@ -192,18 +243,18 @@ export default function HomePage() {
       }
 
       const result = await response.json();
-      console.log('🚀 Component saved for full preview:', result);
+      console.log('🚀 Component saved for fallback preview:', result);
 
       // Open dedicated preview page immediately in new tab
       const previewUrl = `/preview/${encodeURIComponent(normalizedFrameName)}`;
-      console.log('🚀 Opening URL:', previewUrl);
+      console.log('🚀 Opening fallback URL:', previewUrl);
       window.open(previewUrl, '_blank');
       
-      setSuccess(`Full preview opened in new tab: ${targetFrameName}`);
+      setSuccess(`Preview opened in new tab: ${targetFrameName} (fallback mode)`);
       
     } catch (error) {
-      console.error('🚀 Full preview failed:', error);
-      setError('Failed to open full preview: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error('🚀 Preview failed:', error);
+      setError('Failed to open preview: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 

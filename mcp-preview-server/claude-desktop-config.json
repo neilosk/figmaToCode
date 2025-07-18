@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "figma-preview-renderer": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "cwd": "/Users/nkotsiopoulos/Projects/FIGMAtoREACT/figmaToCode/mcp-preview-server",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
