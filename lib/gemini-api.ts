@@ -508,9 +508,14 @@ ${styling === 'tailwind' ? `
 - All styling must be done through className attributes
 ` : styling === 'css' ? `
 - Use CSS modules with descriptive class names
-- Create exact color values and measurements
+- Create exact color values and measurements from the design
 - Use flexbox/grid for layouts
 - Include responsive media queries
+- MANDATORY: You MUST generate a separate CSS file with all styles
+- The CSS file should contain complete styling for the component
+- Use semantic class names that match the JSX structure
+- Include hover effects, transitions, and responsive design
+- The TSX file should import and use these CSS classes
 ` : `
 - Use styled-components for styling
 - Create theme-aware styled elements
@@ -519,6 +524,38 @@ ${styling === 'tailwind' ? `
 `}
 
 === OUTPUT FORMAT ===
+${styling === 'css' ? `
+You MUST generate BOTH files. Follow this EXACT format:
+
+--- TSX FILE ---
+\`\`\`tsx
+import './${node.componentName || node.name.replace(/[^a-zA-Z0-9]/g, '')}.css';
+
+export default function ${node.componentName || node.name.replace(/[^a-zA-Z0-9]/g, '')}() {
+  return (
+    [Complete JSX with exact content and className attributes]
+  );
+}
+\`\`\`
+
+--- CSS FILE ---
+\`\`\`css
+/* Complete CSS styles for the component */
+.component-container {
+  /* Main container styles */
+}
+
+.component-title {
+  /* Title styles */
+}
+
+/* Add all necessary CSS classes with exact design values */
+/* Include responsive breakpoints */
+/* Include hover effects and transitions */
+\`\`\`
+
+CRITICAL: You MUST generate BOTH the TSX file AND the CSS file. The CSS file must contain ALL styling for the component.
+` : `
 Return ONLY the code files in this exact format:
 
 --- TSX FILE ---
@@ -529,8 +566,7 @@ export default function ${node.componentName || node.name.replace(/[^a-zA-Z0-9]/
   );
 }
 \`\`\`
-
-${styling === 'css' ? '--- CSS FILE ---\n[CSS styles with exact design values]\n' : ''}
+`}
 
 CRITICAL COMPONENT REQUIREMENTS:
 1. **COMPLETE FUNCTION COMPONENT**: Must be a complete, exportable React function component
@@ -613,6 +649,11 @@ ${styling === 'tailwind' ? `
 - Use flexbox/grid for complex layouts
 - Include responsive media queries
 - Add hover effects and smooth transitions
+- MANDATORY: You MUST generate a separate CSS file with all styles
+- The CSS file should contain complete styling for the entire page
+- Use semantic class names that match the JSX structure
+- Include section-specific styles for each frame
+- The TSX file should import and use these CSS classes
 ` : `
 - Use styled-components for all styling
 - Create theme-aware components
@@ -621,12 +662,52 @@ ${styling === 'tailwind' ? `
 `}
 
 === OUTPUT FORMAT ===
+${styling === 'css' ? `
+You MUST generate BOTH files. Follow this EXACT format:
+
+--- TSX FILE ---
+\`\`\`tsx
+import './${pageName}.css';
+
+export default function ${pageName}() {
+  return (
+    [Complete page component with exact content from all frames using className attributes]
+  );
+}
+\`\`\`
+
+--- CSS FILE ---
+\`\`\`css
+/* Complete CSS styles for the entire page */
+.page-container {
+  /* Main page container styles */
+}
+
+.header-section {
+  /* Header/Hero section styles */
+}
+
+.main-content {
+  /* Main content area styles */
+}
+
+.footer-section {
+  /* Footer section styles */
+}
+
+/* Add all necessary CSS classes with exact design values from all frames */
+/* Include responsive breakpoints */
+/* Include hover effects and transitions */
+/* Include section-specific styles */
+\`\`\`
+
+CRITICAL: You MUST generate BOTH the TSX file AND the CSS file. The CSS file must contain ALL styling for the entire page.
+` : `
 Return ONLY the complete page component code:
 
 --- TSX FILE ---
 [Complete page component with exact content from all frames]
-
-${styling === 'css' ? '--- CSS FILE ---\n[CSS styles with exact design values from all frames]\n' : ''}
+`}
 
 Generate the complete website now with EXACT fidelity to all frame designs:`;
   }

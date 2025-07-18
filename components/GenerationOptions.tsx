@@ -80,7 +80,7 @@ export default function GenerationOptions({
       {/* AI Provider Selection */}
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-3">
-          AI Provider
+          LLM Arena
         </label>
         <div className="grid grid-cols-3 gap-2">
           <button
