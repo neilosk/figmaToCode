@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FileText, Download, Copy, Eye, Settings, Loader2, AlertCircle, CheckCircle2, Monitor } from 'lucide-react';
+import { FileText, Download, Copy, Eye, Settings, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { ProcessedNode } from '../types/figma';
 import CodeViewer from '../components/CodeViewer';
 import MultiFileCodeViewer from '../components/MultiFileCodeViewer';
@@ -151,59 +151,61 @@ export default function HomePage() {
   };
 
 
-  const handleOpenFullPreview = async (code: string, frameName?: string, files?: Array<{ name: string; content: string; type: string }>) => {
+  const handleCopyPastePreview = async (code: string, frameName?: string, files?: Array<{ name: string; content: string; type: string }>) => {
     try {
-      console.log('🚀 Opening full preview in dedicated page...');
-      console.log('🚀 Original code:', code.substring(0, 500));
-      
-      // Minimal cleaning - just remove HTML artifacts but preserve JSX
-      const cleanCode = code
-        .replace(/<span[^>]*>/g, '') // Remove opening span tags
-        .replace(/<\/span>/g, '')    // Remove closing span tags
-        .replace(/style="[^"]*"/g, '') // Remove inline styles
-        .trim();
-      
-      console.log('🚀 Cleaned code:', cleanCode.substring(0, 500));
+      console.log('📋 Generating copy-paste preview...');
       
       // Determine component name from code or use default
-      const componentMatch = cleanCode.match(/(?:function|const)\s+([A-Za-z][A-Za-z0-9]*)/)
+      const componentMatch = code.match(/(?:function|const)\s+([A-Za-z][A-Za-z0-9]*)/)
       const componentName = componentMatch?.[1] || 'GeneratedComponent';
       
-      // Use the frame name for consistent URL routing
-      const targetFrameName = frameName || selectedFrames[0]?.name || 'default';
-      const normalizedFrameName = targetFrameName.toLowerCase().replace(/\s+/g, '-');
+      console.log('📋 Component name:', componentName);
       
-      // Send to internal preview API
-      const response = await fetch('/api/preview', {
+      // Use the copy-paste preview API
+      const response = await fetch('/api/copy-paste-preview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          componentName,
-          code: cleanCode,
-          frameName: normalizedFrameName, // Store with normalized name
+          code: code,
+          componentName: componentName,
+          styling: options.styling,
           files: files || []
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Copy-paste preview failed: ${response.status} - ${errorText}`);
       }
 
       const result = await response.json();
-      console.log('🚀 Component saved for full preview:', result);
-
-      // Open dedicated preview page immediately in new tab
-      const previewUrl = `/preview/${encodeURIComponent(normalizedFrameName)}`;
-      console.log('🚀 Opening URL:', previewUrl);
-      window.open(previewUrl, '_blank');
       
-      setSuccess(`Full preview opened in new tab: ${targetFrameName}`);
+      if (result.success) {
+        // Copy the HTML to clipboard
+        await navigator.clipboard.writeText(result.html);
+        
+        // Show instructions to user
+        const instructions = result.instructions.join('\n');
+        const userMessage = `✅ HTML Preview Copied to Clipboard!
+
+${instructions}
+
+The complete HTML file is now in your clipboard. Just paste it into a text editor, save as .html, and open in your browser for a perfect preview!`;
+
+        alert(userMessage);
+        setSuccess(`Copy-paste preview ready for ${componentName}!`);
+        
+        console.log('📋 HTML copied to clipboard');
+        console.log('📋 Instructions:', instructions);
+      } else {
+        throw new Error(result.error || 'Failed to generate copy-paste preview');
+      }
       
     } catch (error) {
-      console.error('🚀 Full preview failed:', error);
-      setError('Failed to open full preview: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error('📋 Copy-paste preview failed:', error);
+      setError('Failed to generate copy-paste preview: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -427,12 +429,12 @@ export default function TestComponent() {
                       Download
                     </button>
                     <button
-                      onClick={() => handleOpenFullPreview(generatedCode.code!, selectedFrames[0]?.name, generatedCode.files)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                      title="Open component in dedicated preview page"
+                      onClick={() => handleCopyPastePreview(generatedCode.code!, selectedFrames[0]?.name, generatedCode.files)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                      title="Copy complete HTML file to clipboard for local preview"
                     >
-                      <Monitor className="h-4 w-4" />
-                      Preview
+                      <Copy className="h-4 w-4" />
+                      Copy HTML Preview
                     </button>
                     <button
                       onClick={async () => {
@@ -499,12 +501,12 @@ export default function TestComponent() {
                       Download
                     </button>
                     <button
-                      onClick={() => handleOpenFullPreview(generatedCode.code!, selectedFrames[0]?.name, generatedCode.files)}
-                      className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                      title="Open page in dedicated preview"
+                      onClick={() => handleCopyPastePreview(generatedCode.code!, selectedFrames[0]?.name, generatedCode.files)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                      title="Copy complete HTML file to clipboard for local preview"
                     >
-                      <Monitor className="h-4 w-4" />
-                      Preview
+                      <Copy className="h-4 w-4" />
+                      Copy HTML Preview
                     </button>
                     <button
                       onClick={async () => {

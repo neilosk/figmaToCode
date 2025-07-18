@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Preview</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f8fafc;
+        }
+        .preview-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .preview-header { 
+            background: #f1f5f9; 
+            padding: 20px; 
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .preview-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .preview-content { 
+            padding: 24px; 
+        }
+        .error-display {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            color: #dc2626;
+            margin: 20px 0;
+        }
+        
+        /* Component CSS */
+        css
+.products-container {
+  width: 1440px;
+  height: 2182px;
+  background-color: rgb(248, 249, 249);
+  position: relative;
+  font-family: 'Aeonik Pro', sans-serif;
+}
+
+.main-content {
+  width: 1090px;
+  height: 1928px;
+  margin: 0 auto;
+  padding-top: 175px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.digital-banking-card,
+.account-card,
+.card-section,
+.insurance-card,
+.go4more-card {
+  background-color: rgb(255, 255, 255);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.add-button-container {
+  opacity: 0;
+}
+
+.add-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.add-icon {
+  font-size: 24px;
+  color: rgb(0, 123, 133);
+}
+
+.add-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(0, 123, 133);
+}
+
+.phone-field {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 331px;
+}
+
+.input-field.disabled {
+  opacity: 0.6;
+}
+
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(106, 108, 106);
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-label.disabled {
+  color: rgb(162, 166, 166);
+}
+
+.required {
+  color: rgb(190, 75, 75);
+  font-size: 12px;
+}
+
+.field-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-container.disabled {
+  background-color: rgb(248, 249, 249);
+}
+
+.field-input,
+.field-select {
+  width: 100%;
+  height: 50px;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  outline: none;
+}
+
+.field-input.disabled {
+  background-color: rgb(248, 249, 249);
+  color: rgb(162, 166, 166);
+}
+
+.check-icon {
+  position: absolute;
+  right: 16px;
+  width: 24px;
+  height: 24px;
+}
+
+.check-circle {
+  width: 24px;
+  height: 24px;
+  background-color: rgb(25, 126, 134);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.check-mark {
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.help-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(106, 108, 106);
+  padding-left: 8px;
+}
+
+.account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.account-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.form-row {
+  display: flex;
+  gap: 24px;
+}
+
+.toggle-switch {
+  width: 48px;
+  height: 24px;
+  background-color: rgb(162, 166, 166);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggle-switch.active {
+  background-color: rgb(0, 123, 133);
+}
+
+.toggle-handle {
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  transition: transform 0.3s;
+}
+
+.toggle-switch.active .toggle-handle {
+  transform: translateX(24px);
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-type-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: rgb(233, 255, 234);
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.success-icon {
+  width: 24px;
+  height: 24px;
+  color: rgb(29, 129, 81);
+  font-weight: bold;
+}
+
+.success-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgb(29, 129, 81);
+}
+
+.limits-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.limits-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.limits-grid {
+  display: flex;
+  gap: 24px;
+}
+
+.limits-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.limit-category {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.info-icon {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: rgb(106, 108, 106);
+}
+
+.limit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.limit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.currency {
+  position: absolute;
+  right: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+}
+
+.pos-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pos-fields {
+  display: flex;
+  gap: 24px;
+}
+
+.smart-pin-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.smart-pin-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 24px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.checkbox:checked {
+  background-color: rgb(0, 123, 133);
+  border-color: rgb(0, 123, 133);
+}
+
+.checkbox-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  cursor: pointer;
+}
+
+.confirmation-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.confirmation-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background-color: rgb(0, 56, 65);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  z-index: 1000;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 52px;
+}
+
+.drag-handle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.drag-icon {
+  color: white;
+  font-size: 20px;
+}
+
+.client-info {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgb(248, 249, 249);
+}
+
+.nbg-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-container {
+  width: 108px;
+  height: 31px;
+  background-color: white;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(0, 56, 65);
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.action-button {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+}
+
+.notification-dot {
+  width: 6px;
+  height: 6px;
+  background-color: rgb(208, 130, 57);
+  border-radius: 50%;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.quick-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quick-links-button {
+  background-color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.grid-icon {
+  color: rgb(86, 181, 187);
+  font-size: 16px;
+}
+
+.quick-links-button span {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(22, 32, 32);
+}
+
+.db-button {
+  width: 40px;
+  height: 40px;
+  background-color: rgb(86, 181, 187);
+  border: none;
+  border-radius: 8px;
+  color: rgb(22, 32, 32);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.progress-sidebar {
+  position: fixed;
+  top: 150px;
+  right: 20px;
+  width: 210px;
+  height: 245px;
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 100;
+}
+
+.progress-header {
+  margin-bottom: 16px;
+}
+
+.progress-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+  margin: 0;
+}
+
+.progress-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 8px;
+  border-radius: 4px;
+}
+
+.progress-item.active {
+  background-color: rgb(248, 249, 249);
+}
+
+.progress-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(106, 108, 106);
+}
+
+.progress-item.active .progress-text {
+  color: rgb(22, 32, 32);
+}
+
+.progress-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  color: rgb(106, 108, 106);
+}
+
+.preview-button {
+  background-color: rgb(0, 123, 133);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.left-sidebar {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  width: 80px;
+  height: calc(100vh - 72px);
+  background-color: white;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 100;
+}
+
+.sidebar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sidebar-item.home {
+  background-color: rgb(230, 245, 246);
+}
+
+.sidebar-item.active {
+  background-color: rgb(86, 181, 187);
+  border-radius: 50px;
+}
+
+.sidebar-icon {
+  font-size: 20px;
+  color: rgb(86, 181, 187);
+}
+
+.sidebar-item.active .sidebar-icon {
+  color: rgb(0, 123, 133);
+}
+
+.sidebar-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(0, 123, 133);
+  text-align: center;
+  display: none;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 116px;
+  background-color: rgb(248, 249, 249);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 100;
+}
+
+.bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.back-arrow {
+  font-size: 24px;
+  color: rgb(22, 32, 32);
+}
+
+.back-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22, 32, 32);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.save-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(0, 123, 133);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.complete-button {
+  background-color: rgb(0, 123, 133);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.step-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.step.completed .step-icon {
+  background-color: rgb(230, 245, 246);
+  color: rgb(0, 123, 133);
+}
+
+.step.active .step-icon {
+  background-color: rgb(0, 123, 133);
+  color: white;
+}
+
+.step-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(0, 123, 133);
+}
+
+.step.active .step-text {
+  color: rgb(8, 118, 129);
+}
+
+.step-line {
+  width: 24px;
+  height: 2px;
+  background-color: rgb(224, 230, 225);
+  border-radius: 8px;
+}
+
+.progress-bar {
+  width: 98px;
+  height: 3px;
+  background-color: rgb(0, 123, 133);
+  border-radius: 2px;
+}
+
+.progress-fill {
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0, 123, 133);
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .products-container {
+    width: 100%;
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .input-field {
+    width: 100%;
+  }
+  
+  .limits-grid {
+    flex-direction: column;
+  }
+  
+  .pos-fields {
+    flex-direction: column;
+  }
+  
+  .progress-sidebar {
+    display: none;
+  }
+  
+  .left-sidebar {
+    display: none;
+  }
+  
+  .top-bar {
+    flex-direction: column;
+    height: auto;
+    gap: 16px;
+  }
+  
+  .right-section {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <div class="preview-header">
+            <h1>Products</h1>
+            <div class="preview-badge">Copy-Paste Preview</div>
+        </div>
+        <div class="preview-content">
+            <div id="root">
+                <div style="text-align: center; padding: 40px; color: #64748b;">
+                    Loading component...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/babel">
+        try {
+            // Component code
+            function Products() {
+  return (
+    <div className="products-container">
+      <div className="main-content">
+        <div className="form-section">
+          <div className="digital-banking-card">
+            <div className="card-header">
+              <div className="header-title">
+                <h3 className="section-title">Digital Banking</h3>
+                <div className="add-button-container">
+                  <button className="add-button">
+                    +
+                    Προσθήκη Λογαριασμού
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="phone-field">
+              <div className="input-field">
+                <label className="field-label">
+                  Αριθμός*
+                </label>
+                <div className="field-container">
+                  <input type="text" className="field-input" value="+30 123456789" readOnly />
+                  <div className="check-icon">
+                    <div className="check-circle">
+                      ✓
+                    </div>
+                  </div>
+                </div>
+                <div className="help-text">This is a help caption</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="account-card">
+            <div className="card-header">
+              <h3 className="section-title">Καταθετικοί λογαριασμοί Α' ζήτησης</h3>
+              <div className="add-button-container">
+                <button className="add-button">
+                  +
+                  Προσθήκη Λογαριασμού
+                </button>
+              </div>
+            </div>
+            <div className="account-details">
+              <div className="account-header">
+                <h4 className="account-title">Λογαριασμός</h4>
+                <button className="delete-button">×</button>
+              </div>
+              <div className="form-row">
+                <div className="input-field">
+                  <label className="field-label">
+                    Τύπος *
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>Ταμιευτηρίου</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+                <div className="input-field">
+                  <label className="field-label">
+                    Νόμισμα*
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>EUR (€)</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+                <div className="input-field disabled">
+                  <label className="field-label disabled">
+                    Κατηγορία*
+                  </label>
+                  <div className="field-container disabled">
+                    <input type="text" className="field-input disabled" placeholder="Input text" />
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="input-field">
+                  <label className="field-label">
+                    Προϊόν*
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>Ταμιευτήριο Λογαριασμός Προνομίων</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+                <div className="input-field disabled">
+                  <label className="field-label disabled">
+                    Κατάστημα*
+                  </label>
+                  <div className="field-container disabled">
+                    <input type="text" className="field-input disabled" placeholder="Input text" />
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+                <div className="input-field">
+                  <label className="field-label">
+                    Κινήσεις λογαριασμού*
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>Input text</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="input-field">
+                  <label className="field-label">
+                    Α' Δικαιούχος*
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>Ίδιος</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-section">
+            <div className="card-header">
+              <h3 className="section-title">Κάρτα</h3>
+              <div className="toggle-switch active">
+                <div className="toggle-handle"></div>
+              </div>
+            </div>
+            <div className="card-details">
+              <div className="card-type-header">
+                <h4 className="card-type-title">Τύπος</h4>
+              </div>
+              <div className="form-row">
+                <div className="input-field">
+                  <label className="field-label">
+                    Έκδοση*
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>Instant</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+                <div className="input-field">
+                  <label className="field-label">
+                    Προϊόν*
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>Dual Debit Mastercard</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+                <div className="input-field">
+                  <label className="field-label">
+                    Αριθμός Διαθέσιμης Κάρτας*
+                  </label>
+                  <div className="field-container">
+                    <select className="field-select">
+                      <option>002-XXXX</option>
+                    </select>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+              </div>
+              <div className="success-message">
+                <div className="success-icon">✓</div>
+                Όλα τα στοιχεία έχουν συπληρωθεί επιτυχώς.
+              </div>
+            </div>
+
+            <div className="limits-section">
+              <h4 className="limits-title">Ημερήσια Όρια</h4>
+              <div className="limits-grid">
+                <div className="limits-column">
+                  <div className="limit-category">
+                    <h5 className="category-title">Ανάληψη Μετρητών</h5>
+                    <div className="info-icon">i</div>
+                  </div>
+                  <div className="limit-fields">
+                    <div className="limit-field">
+                      <label className="field-label">Συνολικό Όριο</label>
+                      <div className="field-container">
+                        <input type="text" className="field-input" value="3,000" />
+                        €
+                      </div>
+                    </div>
+                    <div className="limit-field">
+                      <label className="field-label">Εσωτερικού</label>
+                      <div className="field-container">
+                        <input type="text" className="field-input" value="3,000" />
+                        €
+                      </div>
+                      <div className="help-text">Μέγιστο: 3,000.00 € </div>
+                    </div>
+                    <div className="limit-field">
+                      <label className="field-label">Εξωτερικού</label>
+                      <div className="field-container">
+                        <input type="text" className="field-input" value="3,000" />
+                        €
+                      </div>
+                      <div className="help-text">Μέγιστο: 3,000.00 € </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="limits-column">
+                  <div className="limit-category">
+                    <h5 className="category-title">Διαδικτυακές Αγορές</h5>
+                    <div className="info-icon">i</div>
+                  </div>
+                  <div className="limit-fields">
+                    <div className="limit-field">
+                      <label className="field-label">Συνολικό Όριο</label>
+                      <div className="field-container">
+                        <input type="text" className="field-input" value="3,000" />
+                        €
+                      </div>
+                    </div>
+                    <div className="limit-field">
+                      <label className="field-label">Εσωτερικού</label>
+                      <div className="field-container">
+                        <input type="text" className="field-input" value="3,000" />
+                        €
+                      </div>
+                      <div className="help-text">Μέγιστο: 3,000.00 € </div>
+                    </div>
+                    <div className="limit-field">
+                      <label className="field-label">Εξωτερικού</label>
+                      <div className="field-container">
+                        <input type="text" className="field-input" value="3,000" />
+                        €
+                      </div>
+                      <div className="help-text">Μέγιστο: 3,000.00 € </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="pos-section">
+                <h5 className="category-title">Διαδυκτιακών Αγορών & POS</h5>
+                <div className="pos-fields">
+                  <div className="limit-field">
+                    <label className="field-label">Συνολικό Όριο</label>
+                    <div className="field-container">
+                      <input type="text" className="field-input" value="3,000" />
+                      €
+                    </div>
+                    <div className="help-text">Μέγιστο: 10,000.00 € </div>
+                  </div>
+                  <div className="limit-field">
+                    <label className="field-label">Συνολικό Όριο</label>
+                    <div className="field-container">
+                      <input type="text" className="field-input" value="10.000" />
+                      €
+                    </div>
+                    <div className="help-text">This is a help caption</div>
+                  </div>
+                  <div className="limit-field">
+                    <label className="field-label">Συνολικό Όριο</label>
+                    <div className="field-container">
+                      <input type="text" className="field-input" value="10.000" />
+                      €
+                    </div>
+                    <div className="help-text">This is a help caption</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="smart-pin-section">
+              <h4 className="smart-pin-title">Smart PIN</h4>
+              <div className="checkbox-row">
+                <div className="checkbox-item">
+                  <input type="checkbox" className="checkbox" id="pinPositions" checked />
+                  <label htmlFor="pinPositions" className="checkbox-label">Pin Positions</label>
+                </div>
+                <div className="checkbox-item">
+                  <input type="checkbox" className="checkbox" id="pinCode" />
+                  <label htmlFor="pinCode" className="checkbox-label">15-Ψήφιος Κωδικός</label>
+                </div>
+              </div>
+            </div>
+
+            <div className="confirmation-section">
+              <h4 className="confirmation-title">Μέσο Επιβεβαίωσης</h4>
+              <div className="checkbox-row">
+                <div className="checkbox-item">
+                  <input type="checkbox" className="checkbox" id="sms" checked />
+                  <label htmlFor="sms" className="checkbox-label">SMS</label>
+                </div>
+                <div className="checkbox-item">
+                  <input type="checkbox" className="checkbox" id="email" />
+                  <label htmlFor="email" className="checkbox-label">Email</label>
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="input-field">
+                  <label className="field-label">
+                    Κινητό Επικοινωνίας*
+                  </label>
+                  <div className="field-container">
+                    <input type="text" className="field-input" value="+30 123456789" />
+                    <div className="check-icon">
+                      <div className="check-circle">
+                        ✓
+                      </div>
+                    </div>
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+                <div className="input-field">
+                  <label className="field-label">
+                    Email*
+                  </label>
+                  <div className="field-container">
+                    <input type="text" className="field-input" value="example@mail.com" />
+                  </div>
+                  <div className="help-text">This is a help caption</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="insurance-card">
+            <div className="card-header">
+              <h3 className="section-title">Ασφαλιστικά  Προϊόντα</h3>
+              <div className="toggle-switch">
+                <div className="toggle-handle"></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="go4more-card">
+            <div className="card-header">
+              <h3 className="section-title">Go4More</h3>
+              <div className="toggle-switch">
+                <div className="toggle-handle"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="top-bar">
+        <div className="left-section">
+          <div className="drag-handle">
+            <div className="drag-icon">⋮⋮⋮</div>
+          </div>
+          <div className="client-info">Βλάχου Δέσποινα, Δημήτριος (427984246)</div>
+        </div>
+        <div className="nbg-logo">
+          <div className="logo-container">
+            <div className="logo-text">NBG</div>
+          </div>
+        </div>
+        <div className="right-section">
+          <div className="action-buttons">
+            <button className="action-button">🔍</button>
+            <button className="action-button">
+              🔔
+              <div className="notification-dot"></div>
+            </button>
+            <button className="action-button">☰</button>
+          </div>
+          <div className="quick-links">
+            <button className="quick-links-button">
+              <div className="grid-icon">⚏</div>
+              Quick links
+            </button>
+            <button className="db-button">ΔΒ</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="progress-sidebar">
+        <div className="progress-header">
+          <h4 className="progress-title">Πρόοδος ενοτήτων</h4>
+        </div>
+        <div className="progress-items">
+          <div className="progress-item completed">
+            Digital Banking
+            ✓
+          </div>
+          <div className="progress-item active">
+            Καταθετικοί λογαριασμοί Α' ζήτησης
+            ✓
+          </div>
+          <div className="progress-item">
+            Έκδοση Κάρτας
+            !
+          </div>
+          <div className="progress-item">
+            Ασφαλιστικά  Προϊόντα
+            !
+          </div>
+          <div className="progress-item">
+            Go4More
+            !
+          </div>
+        </div>
+        <button className="preview-button">Προεπισκόπηση</button>
+      </div>
+
+      <div className="left-sidebar">
+        <div className="sidebar-item home">
+          <div className="sidebar-icon">🏠</div>
+          Αρχική Σελίδα
+        </div>
+        <div className="sidebar-item active">
+          <div className="sidebar-icon">👤</div>
+          CRM Λιανικής
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">⭐</div>
+          Διασφάλιση Ποιότητας
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">🎯</div>
+          Στοχοθεσία & Επιβραβεύσεις
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">🎧</div>
+          Case Management Tool
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">📦</div>
+          Προϊόντα & Υπηρεσίες
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">📁</div>
+          Αναφορές
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">📄</div>
+          Έγγραφα & Υπογραφές
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">💼</div>
+          Corporate Tools
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-icon">📊</div>
+          Power Apps
+        </div>
+      </div>
+
+      <div className="bottom-bar">
+        <div className="bottom-content">
+          <div className="back-button">
+            ←
+            Δημιουργία Λογαριασμού
+          </div>
+          <div className="action-buttons">
+            <button className="save-button">Αποθήκευση αλλαγών</button>
+            <button className="complete-button">Ολοκλήρωση</button>
+          </div>
+        </div>
+        <div className="stepper">
+          <div className="step completed">
+            <div className="step-icon">✓</div>
+            Στοιχεία πελάτη
+          </div>
+          <div className="step-line"></div>
+          <div className="step active">
+            <div className="step-icon">●</div>
+            Προϊόντα
+          </div>
+        </div>
+        <div className="progress-bar">
+          <div className="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+            
+            // Try to render the component
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            
+            // Look for the component function
+            let ComponentFunction = null;
+            
+            // Try different ways to find the component
+            if (typeof Products !== 'undefined') {
+                ComponentFunction = Products;
+            } else if (typeof window.Products !== 'undefined') {
+                ComponentFunction = window.Products;
+            } else {
+                // Look for any function that looks like a component
+                const possibleComponents = Object.keys(window).filter(key => 
+                    typeof window[key] === 'function' && 
+                    key.charAt(0) === key.charAt(0).toUpperCase() &&
+                    !['React', 'ReactDOM', 'Babel', 'Component', 'PureComponent'].includes(key)
+                );
+                
+                if (possibleComponents.length > 0) {
+                    ComponentFunction = window[possibleComponents[0]];
+                }
+            }
+            
+            if (ComponentFunction) {
+                root.render(React.createElement(ComponentFunction));
+            } else {
+                throw new Error(`Component '${componentName}' not found`);
+            }
+            
+        } catch (error) {
+            console.error('Render error:', error);
+            document.getElementById('root').innerHTML = `
+                <div class="error-display">
+                    <h3>⚠️ Render Error</h3>
+                    <p><strong>Component:</strong> Products</p>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <details style="margin-top: 10px;">
+                        <summary>Debug Info</summary>
+                        <pre style="font-size: 12px; white-space: pre-wrap;">${error.stack}</pre>
+                    </details>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
