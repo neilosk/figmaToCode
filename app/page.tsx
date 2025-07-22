@@ -153,15 +153,15 @@ export default function HomePage() {
 
   const handleCopyPastePreview = async (code: string, frameName?: string, files?: Array<{ name: string; content: string; type: string }>) => {
     try {
-      console.log('📋 Generating copy-paste preview...');
+      console.log('📁 Generating HTML preview file...');
       
       // Determine component name from code or use default
       const componentMatch = code.match(/(?:function|const)\s+([A-Za-z][A-Za-z0-9]*)/)
       const componentName = componentMatch?.[1] || 'GeneratedComponent';
       
-      console.log('📋 Component name:', componentName);
+      console.log('📁 Component name:', componentName);
       
-      // Use the copy-paste preview API
+      // Use the automated HTML file generation API
       const response = await fetch('/api/copy-paste-preview', {
         method: 'POST',
         headers: {
@@ -177,35 +177,35 @@ export default function HomePage() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Copy-paste preview failed: ${response.status} - ${errorText}`);
+        throw new Error(`HTML file generation failed: ${response.status} - ${errorText}`);
       }
 
       const result = await response.json();
       
       if (result.success) {
-        // Copy the HTML to clipboard
-        await navigator.clipboard.writeText(result.html);
-        
-        // Show instructions to user
+        // Show success message with file information
         const instructions = result.instructions.join('\n');
-        const userMessage = `✅ HTML Preview Copied to Clipboard!
+        const userMessage = `🎉 HTML Preview File Created!
 
 ${instructions}
 
-The complete HTML file is now in your clipboard. Just paste it into a text editor, save as .html, and open in your browser for a perfect preview!`;
+File Location: ${result.filename}
+
+The HTML file has been automatically created in your project root. Just double-click it to open in your browser!`;
 
         alert(userMessage);
-        setSuccess(`Copy-paste preview ready for ${componentName}!`);
+        setSuccess(`HTML preview file created: ${result.filename}`);
         
-        console.log('📋 HTML copied to clipboard');
-        console.log('📋 Instructions:', instructions);
+        console.log('📁 File created successfully:', result.filename);
+        console.log('📁 File path:', result.filepath);
+        console.log('📁 Instructions:', instructions);
       } else {
-        throw new Error(result.error || 'Failed to generate copy-paste preview');
+        throw new Error(result.error || 'Failed to generate HTML preview file');
       }
       
     } catch (error) {
-      console.error('📋 Copy-paste preview failed:', error);
-      setError('Failed to generate copy-paste preview: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error('📁 HTML file generation failed:', error);
+      setError('Failed to create HTML preview file: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -431,10 +431,10 @@ export default function TestComponent() {
                     <button
                       onClick={() => handleCopyPastePreview(generatedCode.code!, selectedFrames[0]?.name, generatedCode.files)}
                       className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                      title="Copy complete HTML file to clipboard for local preview"
+                      title="Generate HTML preview file automatically in project root"
                     >
-                      <Copy className="h-4 w-4" />
-                      Copy HTML Preview
+                      <FileText className="h-4 w-4" />
+                      Generate HTML File
                     </button>
                     <button
                       onClick={async () => {
@@ -503,10 +503,10 @@ export default function TestComponent() {
                     <button
                       onClick={() => handleCopyPastePreview(generatedCode.code!, selectedFrames[0]?.name, generatedCode.files)}
                       className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
-                      title="Copy complete HTML file to clipboard for local preview"
+                      title="Generate HTML preview file automatically in project root"
                     >
-                      <Copy className="h-4 w-4" />
-                      Copy HTML Preview
+                      <FileText className="h-4 w-4" />
+                      Generate HTML File
                     </button>
                     <button
                       onClick={async () => {

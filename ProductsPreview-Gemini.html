@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Preview</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f8fafc;
+        }
+        .preview-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .preview-header { 
+            background: #f1f5f9; 
+            padding: 20px; 
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .preview-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .preview-content { 
+            padding: 24px; 
+        }
+        .error-display {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            color: #dc2626;
+            margin: 20px 0;
+        }
+        
+        /* Component CSS */
+        ```css
+/* Products.css */
+
+/* Color Variables */
+:root {
+  --color-light-grey-bg: rgb(248, 249, 249);
+  --color-white: rgb(255, 255, 255);
+  --color-dark-text: rgb(22, 32, 32);
+  --color-primary-blue: rgb(0, 123, 133);
+  --color-grey-text: rgb(106, 108, 106);
+  --color-red-asterisk: rgb(190, 75, 75);
+  --color-darker-blue: rgb(25, 126, 134);
+  --color-medium-grey: rgb(162, 166, 166);
+  --color-green-light-bg: rgb(233, 255, 234);
+  --color-green-dark-text: rgb(29, 129, 81);
+  --color-dark-blue-bg: rgb(0, 56, 65);
+  --color-orange-dot: rgb(208, 130, 57);
+  --color-light-blue-active: rgb(86, 181, 187);
+  --color-dark-blue-active: rgb(8, 118, 129);
+  --color-light-blue-bg: rgb(230, 245, 246);
+  --color-stepper-line: rgb(224, 230, 225);
+}
+
+/* Base Styles */
+body {
+  margin: 0;
+  font-family: 'Aeonik Pro', sans-serif; /* Default font */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Main Container */
+.products-page-container {
+  width: 1440px; /* Exact width from design */
+  height: 2182px; /* Exact height from design */
+  background-color: var(--color-light-grey-bg);
+  display: flex;
+  flex-direction: column;
+  position: relative; /* For absolute positioning of sidebars if needed, or just flex */
+  margin: 0 auto; /* Center the container */
+}
+
+/* Header */
+.products-header {
+  width: 100%; /* 1440px */
+  height: 72px;
+  background-color: var(--color-dark-blue-bg);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box; /* Include padding in width/height */
+}
+
+.products-header-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 52px;
+  height: 40px;
+}
+
+.products-header-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.products-header-customer-info {
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Aeonik Pro', sans-serif;
+  color: var(--color-light-grey-bg); /* Text color from design analysis */
+  text-align: center; /* From design analysis */
+  margin: 0;
+}
+
+.products-header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 32px;
+  height: 40px;
+}
+
+.products-header-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+}
+
+.products-header-action-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 32px; /* Ellipse */
+  padding: 14px; /* Adjusted to center icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.products-header-action-item-list-view {
+  border-radius: 8px; /* Rectangle */
+}
+
+.notification-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-orange-dot);
+  border-radius: 50%;
+  position: absolute;
+  top: 10px; /* Adjusted for visual placement */
+  right: 10px; /* Adjusted for visual placement */
+}
+
+.products-header-quick-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  height: 40px;
+}
+
+.products-header-quick-links-content {
+  width: 126px;
+  height: 40px;
+  border-radius: 8px;
+  padding: 14px; /* Adjusted to center content */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.products-header-quick-links-text {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: var(--color-white);
+  text-align: left;
+}
+
+.products-header-db-button {
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-light-blue-active);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.products-header-db-text {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: var(--color-dark-text);
+  text-align: left;
+}
+
+/* Main Content Wrapper (for layout of central content and sidebars) */
+.products-main-content-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1; /* Allows it to take remaining vertical space */
+  padding: 20px 0; /* Adjust padding to align with header/footer if needed */
+  box-sizing: border-box;
+  justify-content: space-between; /* Distribute content and sidebars */
+  align-items: flex-start; /* Align items to the top */
+}
+
+/* Left Sidebar */
+.products-left-sidebar {
+  width: 80px;
+  background-color: var(--color-white);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.sidebar-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px; /* For circular items */
+  padding: 8px 12px; /* Adjusted for icon centering */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-item-active {
+  background-color: var(--color-light-blue-bg);
+  border-radius: 12px; /* Specific for this item */
+}
+
+.sidebar-item:hover {
+  background-color: var(--color-light-blue-bg);
+}
+
+.sidebar-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-icon-wrapper-active {
+  background-color: var(--color-light-blue-active);
+  border-radius: 999px; /* Specific for these icons */
+  padding: 0 0; /* Reset padding if any */
+}
+
+.sidebar-item-text {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Aeonik Pro', sans-serif;
+  color: var(--color-white); /* Default text color, will be overridden */
+  text-align: left;
+  display: none; /* Hidden by default on narrow sidebar */
+}
+
+.sidebar-item-text-active {
+  color: var(--color-primary-blue); /* Specific active text color */
+}
+
+/* Central Content Column */
+.products-central-content
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <div class="preview-header">
+            <h1>Products</h1>
+            <div class="preview-badge">Copy-Paste Preview</div>
+        </div>
+        <div class="preview-content">
+            <div id="root">
+                <div style="text-align: center; padding: 40px; color: #64748b;">
+                    Loading component...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="text/babel">
+        try {
+            // Component code
+            function Products() {
+  return (
+    <div className="products-page-container">
+      {/* Header Section */}
+      <header className="products-header">
+        <div className="products-header-left">
+          <div className="products-header-icon-wrapper">
+            {/* Functional / Drag n drop icon placeholder */}
+            <div className="icon-placeholder drag-n-drop-icon"></div>
+          </div>
+          <p className="products-header-customer-info">Βλάχου Δέσποινα, Δημήτριος (427984246)</p>
+        </div>
+        <div className="products-header-right">
+          <div className="products-header-actions">
+            <div className="products-header-action-item">
+              <div className="products-header-action-icon-wrapper">
+                {/* Search icon placeholder */}
+                <div className="icon-placeholder search-icon"></div>
+              </div>
+            </div>
+            <div className="products-header-action-item">
+              <div className="products-header-action-icon-wrapper">
+                {/* Notification icon placeholder */}
+                <div className="icon-placeholder notification-icon"></div>
+              </div>
+              <div className="notification-dot"></div>
+            </div>
+            <div className="products-header-action-item products-header-action-item-list-view">
+              <div className="products-header-action-icon-wrapper">
+                {/* List_view_icon placeholder */}
+                <div className="icon-placeholder list-view-icon">
+                  <div className="list-view-line"></div>
+                  <div className="list-view-line"></div>
+                  <div className="list-view-line"></div>
+                  <div className="list-view-dot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="products-header-quick-links">
+            <div className="products-header-quick-links-content">
+              <div className="products-header-quick-links-icon-wrapper">
+                {/* Grid_view_icon placeholder */}
+                <div className="icon-placeholder grid-view-icon">
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                  <div className="grid-view-square"></div>
+                </div>
+              </div>
+              Quick links
+            </div>
+            <div className="products-header-db-button">
+              ΔΒ
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <div className="products-main-content-wrapper">
+        {/* Left Sidebar */}
+        <aside className="products-left-sidebar">
+          <div className="sidebar-item sidebar-item-active">
+            <div className="sidebar-icon-wrapper">
+              {/* Functional / House icon placeholder */}
+              <div className="icon-placeholder house-icon"></div>
+            </div>
+            Αρχική Σελίδα
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Advisor icon placeholder */}
+              <div className="icon-placeholder advisor-icon"></div>
+            </div>
+            CRM Λιανικής
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Functional / Star icon placeholder */}
+              <div className="icon-placeholder star-icon"></div>
+            </div>
+            Διασφάλιση Ποιότητας
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Functional / Target icon placeholder */}
+              <div className="icon-placeholder target-icon"></div>
+            </div>
+            Στοχοθεσία & Επιβραβεύσεις
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper">
+              {/* Functional / Headphones icon placeholder */}
+              <div className="icon-placeholder headphones-icon"></div>
+            </div>
+            Case Management Tool
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Functional / Package icon placeholder */}
+              <div className="icon-placeholder package-icon"></div>
+            </div>
+            Προϊόντα & Υπηρεσίες
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Functional / Folder icon placeholder */}
+              <div className="icon-placeholder folder-icon"></div>
+            </div>
+            Αναφορές
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Functional / Document icon placeholder */}
+              <div className="icon-placeholder document-icon"></div>
+            </div>
+            Έγγραφα & Υπογραφές
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Functional / Briefcase icon placeholder */}
+              <div className="icon-placeholder briefcase-icon"></div>
+            </div>
+            Corporate Tools
+          </div>
+          <div className="sidebar-item">
+            <div className="sidebar-icon-wrapper sidebar-icon-wrapper-active">
+              {/* Functional / Layers icon placeholder */}
+              <div className="icon-placeholder layers-icon"></div>
+            </div>
+            Power Apps
+          </div>
+        </aside>
+
+        {/* Central Content Column */}
+        <main className="products-central-content">
+          {/* Digital Banking Section */}
+          <section className="products-card">
+            <div className="products-card-header">
+              <h2 className="products-card-title">Digital Banking</h2>
+              <div className="add-account-button-wrapper products-card-header-button-hidden">
+                {/* Functional / + icon placeholder */}
+                <div className="icon-placeholder plus-icon"></div>
+                Προσθήκη Λογαριασμού
+              </div>
+            </div>
+            <div className="input-field-group">
+              <div className="input-field-container">
+                <div className="input-label-wrapper">
+                  <label className="input-label">Αριθμός</label>
+                  *
+                </div>
+                <div className="input-field">
+                  +30 123456789
+                  <div className="input-check-icon">
+                    {/* Check icon placeholder */}
+                    <div className="check-icon-bg"></div>
+                    <div className="check-icon-path"></div>
+                  </div>
+                </div>
+                <div className="help-caption-wrapper">
+                  This is a help caption
+                  {/* Question mark icon placeholder */}
+                  <div className="icon-placeholder question-mark-icon"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Καταθετικοί λογαριασμοί Α’ ζήτησης Section */}
+          <section className="products-card">
+            <div className="products-card-header">
+              <h2 className="products-card-title">Καταθετικοί λογαριασμοί Α’ ζήτησης</h2>
+              <div className="add-account-button-wrapper products-card-header-button-hidden">
+                {/* Functional / + icon placeholder */}
+                <div className="icon-placeholder plus-icon"></div>
+                Προσθήκη Λογαριασμού
+              </div>
+            </div>
+            <div className="products-sub-card">
+              <div className="products-sub-card-header">
+                <h3 className="products-sub-card-title">Λογαριασμός</h3>
+                {/* Functional / Delete icon placeholder (hidden) */}
+                <div className="icon-placeholder delete-icon-hidden"></div>
+              </div>
+              <div className="input-field-row">
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Τύπος </label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Ταμιευτηρίου
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Νόμισμα</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    EUR (€)
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+                <div className="input-field-container input-field-container-disabled">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Κατηγορία</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Input text
+                    <div className="icon-placeholder eye-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="input-field-row">
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Προϊόν</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Ταμιευτήριο Λογαριασμός Προνομίων
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+                <div className="input-field-container input-field-container-disabled">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Κατάστημα</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Input text
+                    <div className="icon-placeholder eye-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Κινήσεις λογαριασμού</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Input text
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="input-field-row">
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Α’ Δικαιούχος</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Ίδιος
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Κάρτα Section */}
+          <section className="products-card">
+            <div className="products-card-header">
+              <h2 className="products-card-title">Κάρτα</h2>
+              <div className="toggle-switch toggle-switch-active">
+                <div className="toggle-circle"></div>
+              </div>
+            </div>
+            <div className="products-sub-card">
+              <h3 className="products-sub-card-title">Τύπος</h3>
+              <div className="input-field-row">
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Έκδοση</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Instant
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Προϊόν</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    Dual Debit Mastercard
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Αριθμός Διαθέσιμης Κάρτας</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    002-XXXX
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="success-message-banner">
+              {/* Functional /check circle icon placeholder */}
+              <div className="icon-placeholder check-circle-icon"></div>
+              <p className="success-message-text">Όλα τα στοιχεία έχουν συπληρωθεί επιτυχώς.</p>
+            </div>
+
+            <div className="products-sub-card">
+              <div className="products-sub-card-header">
+                <h3 className="products-sub-card-title">Ημερήσια Όρια</h3>
+              </div>
+              <div className="daily-limits-section">
+                <div className="daily-limits-column">
+                  <div className="daily-limits-header">
+                    <h3 className="daily-limits-title">Ανάληψη Μετρητών</h3>
+                    <div className="icon-placeholder info-icon"></div>
+                  </div>
+                  <div className="input-field-with-reset">
+                    <div className="input-field-container">
+                      <div className="input-label-wrapper">
+                        <label className="input-label">Συνολικό Όριο</label>
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                      <div className="input-field input-field-currency">
+                        3,000
+                        €
+                      </div>
+                    </div>
+                    <div className="icon-placeholder reset-icon"></div>
+                  </div>
+                  <div className="input-field-with-reset">
+                    <div className="input-field-container">
+                      <div className="input-label-wrapper">
+                        <label className="input-label">Εσωτερικού</label>
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                      <div className="input-field input-field-currency">
+                        3,000
+                        €
+                      </div>
+                      <div className="help-caption-wrapper">
+                        Μέγιστο: 3,000.00 € 
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                    </div>
+                    <div className="icon-placeholder reset-icon"></div>
+                  </div>
+                  <div className="input-field-with-reset">
+                    <div className="input-field-container">
+                      <div className="input-label-wrapper">
+                        <label className="input-label">Εξωτερικού</label>
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                      <div className="input-field input-field-currency">
+                        3,000
+                        €
+                      </div>
+                      <div className="help-caption-wrapper">
+                        Μέγιστο: 3,000.00 € 
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                    </div>
+                    <div className="icon-placeholder reset-icon"></div>
+                  </div>
+                </div>
+                <div className="vertical-divider"></div>
+                <div className="daily-limits-column">
+                  <div className="daily-limits-header">
+                    <h3 className="daily-limits-title">Διαδικτυακές Αγορές</h3>
+                    <div className="icon-placeholder info-icon"></div>
+                  </div>
+                  <div className="input-field-with-reset">
+                    <div className="input-field-container">
+                      <div className="input-label-wrapper">
+                        <label className="input-label">Συνολικό Όριο</label>
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                      <div className="input-field input-field-currency">
+                        3,000
+                        €
+                      </div>
+                    </div>
+                    <div className="icon-placeholder reset-icon"></div>
+                  </div>
+                  <div className="input-field-with-reset">
+                    <div className="input-field-container">
+                      <div className="input-label-wrapper">
+                        <label className="input-label">Εσωτερικού</label>
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                      <div className="input-field input-field-currency">
+                        3,000
+                        €
+                      </div>
+                      <div className="help-caption-wrapper">
+                        Μέγιστο: 3,000.00 € 
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                    </div>
+                    <div className="icon-placeholder reset-icon"></div>
+                  </div>
+                  <div className="input-field-with-reset">
+                    <div className="input-field-container">
+                      <div className="input-label-wrapper">
+                        <label className="input-label">Εξωτερικού</label>
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                      <div className="input-field input-field-currency">
+                        3,000
+                        €
+                      </div>
+                      <div className="help-caption-wrapper">
+                        Μέγιστο: 3,000.00 € 
+                        <div className="icon-placeholder question-mark-icon"></div>
+                      </div>
+                    </div>
+                    <div className="icon-placeholder reset-icon"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="daily-limits-section-single-row">
+                <div className="daily-limits-header">
+                  <h3 className="daily-limits-title">Διαδυκτιακών Αγορών & POS</h3>
+                  <div className="icon-placeholder info-icon"></div>
+                </div>
+                <div className="input-field-with-reset">
+                  <div className="input-field-container">
+                    <div className="input-label-wrapper">
+                      <label className="input-label">Συνολικό Όριο</label>
+                      <div className="icon-placeholder question-mark-icon"></div>
+                    </div>
+                    <div className="input-field input-field-currency">
+                      3,000
+                      €
+                    </div>
+                    <div className="help-caption-wrapper">
+                      Μέγιστο: 10,000.00 € 
+                      <div className="icon-placeholder question-mark-icon"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="input-field-with-reset input-field-with-reset-hidden">
+                  <div className="input-field-container">
+                    <div className="input-label-wrapper">
+                      <label className="input-label">Συνολικό Όριο</label>
+                      <div className="icon-placeholder question-mark-icon"></div>
+                    </div>
+                    <div className="input-field input-field-currency">
+                      10.000
+                      €
+                    </div>
+                    <div className="help-caption-wrapper">
+                      This is a help caption
+                      <div className="icon-placeholder question-mark-icon"></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="input-field-with-reset input-field-with-reset-hidden">
+                  <div className="input-field-container">
+                    <div className="input-label-wrapper">
+                      <label className="input-label">Συνολικό Όριο</label>
+                      <div className="icon-placeholder question-mark-icon"></div>
+                    </div>
+                    <div className="input-field input-field-currency">
+                      10.000
+                      €
+                    </div>
+                    <div className="help-caption-wrapper">
+                      This is a help caption
+                      <div className="icon-placeholder question-mark-icon"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="products-sub-card">
+              <h3 className="products-sub-card-title">Smart PIN</h3>
+              <div className="checkbox-group">
+                <div className="checkbox-item">
+                  <div className="checkbox-box checkbox-box-checked">
+                    <div className="checkbox-check-path"></div>
+                  </div>
+                  Pin Positions
+                </div>
+                <div className="checkbox-item">
+                  <div className="checkbox-box"></div>
+                  15-Ψήφιος Κωδικός
+                </div>
+              </div>
+            </div>
+
+            <div className="products-sub-card">
+              <h3 className="products-sub-card-title">Μέσο Επιβεβαίωσης</h3>
+              <div className="checkbox-group">
+                <div className="checkbox-item">
+                  <div className="checkbox-box checkbox-box-checked">
+                    <div className="checkbox-check-path"></div>
+                  </div>
+                  SMS
+                </div>
+                <div className="checkbox-item">
+                  <div className="checkbox-box"></div>
+                  Email
+                </div>
+              </div>
+              <div className="input-field-row">
+                <div className="input-field-container">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Κινητό Επικοινωνίας</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    +30 123456789
+                    <div className="input-check-icon">
+                      <div className="check-icon-bg"></div>
+                      <div className="check-icon-path"></div>
+                    </div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+                <div className="input-field-container input-field-container-hidden">
+                  <div className="input-label-wrapper">
+                    <label className="input-label">Email</label>
+                    *
+                  </div>
+                  <div className="input-field">
+                    example@mail.com
+                    <div className="icon-placeholder chevron-down-icon"></div>
+                  </div>
+                  <div className="help-caption-wrapper">
+                    This is a help caption
+                    <div className="icon-placeholder question-mark-icon"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Ασφαλιστικά Προϊόντα Section */}
+          <section className="products-card">
+            <div className="products-card-header">
+              <h2 className="products-card-title">Ασφαλιστικά Προϊόντα</h2>
+              <div className="toggle-switch">
+                <div className="toggle-circle"></div>
+              </div>
+            </div>
+          </section>
+
+          {/* Go4More Section */}
+          <section className="products-card">
+            <div className="products-card-header">
+              <h2 className="products-card-title">Go4More</h2>
+              <div className="toggle-switch">
+                <div className="toggle-circle"></div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        {/* Right Sidebar */}
+        <aside className="products-right-sidebar">
+          <h3 className="sidebar-progress-title">Πρόοδος ενοτήτων</h3>
+          <nav className="sidebar-progress-nav">
+            <div className="sidebar-progress-item">
+              Digital Banking
+              <div className="icon-placeholder check-circle-icon-small"></div>
+            </div>
+            <div className="sidebar-progress-item sidebar-progress-item-active">
+              Καταθετικοί λογαριασμοί Α’ ζήτησης
+              <div className="icon-placeholder check-circle-icon-small"></div>
+            </div>
+            <div className="sidebar-progress-item">
+              Έκδοση Κάρτας
+              <div className="icon-placeholder exclamation-circle-icon-small"></div>
+            </div>
+            <div className="sidebar-progress-item">
+              Ασφαλιστικά Προϊόντα
+              <div className="icon-placeholder exclamation-circle-icon-small"></div>
+            </div>
+            <div className="sidebar-progress-item">
+              Go4More
+              <div className="icon-placeholder exclamation-circle-icon-small"></div>
+            </div>
+          </nav>
+          <button className="preview-button">
+            Προεπισκόπηση
+          </button>
+        </aside>
+      </div>
+
+      {/* Footer Section */}
+      <footer className="products-footer">
+        <div className="footer-stepper-wrapper">
+          <div className="stepper-step">
+            <div className="stepper-icon stepper-icon-completed">
+              {/* Check circle icon placeholder */}
+              <div className="icon-placeholder check-circle-icon-tiny"></div>
+            </div>
+            Στοιχεία πελάτη
+          </div>
+          <div className="stepper-line"></div>
+          <div className="stepper-step">
+            <div className="stepper-icon stepper-icon-active">
+              <div className="stepper-dot"></div>
+            </div>
+            Προϊόντα
+          </div>
+        </div>
+        <div className="footer-buttons">
+          <button className="save-changes-button products-card-header-button-hidden">
+            Αποθήκευση αλλαγών
+          </button>
+          <button className="complete-button">
+            Ολοκλήρωση
+          </button>
+        </div>
+      </footer>
+    </div>
+  );
+}
+            
+            // Try to render the component
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            
+            // Look for the component function
+            let ComponentFunction = null;
+            
+            // Try different ways to find the component
+            if (typeof Products !== 'undefined') {
+                ComponentFunction = Products;
+            } else if (typeof window.Products !== 'undefined') {
+                ComponentFunction = window.Products;
+            } else {
+                // Look for any function that looks like a component
+                const possibleComponents = Object.keys(window).filter(key => 
+                    typeof window[key] === 'function' && 
+                    key.charAt(0) === key.charAt(0).toUpperCase() &&
+                    !['React', 'ReactDOM', 'Babel', 'Component', 'PureComponent'].includes(key)
+                );
+                
+                if (possibleComponents.length > 0) {
+                    ComponentFunction = window[possibleComponents[0]];
+                }
+            }
+            
+            if (ComponentFunction) {
+                root.render(React.createElement(ComponentFunction));
+            } else {
+                throw new Error(`Component '${componentName}' not found`);
+            }
+            
+        } catch (error) {
+            console.error('Render error:', error);
+            document.getElementById('root').innerHTML = `
+                <div class="error-display">
+                    <h3>⚠️ Render Error</h3>
+                    <p><strong>Component:</strong> Products</p>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <details style="margin-top: 10px;">
+                        <summary>Debug Info</summary>
+                        <pre style="font-size: 12px; white-space: pre-wrap;">${error.stack}</pre>
+                    </details>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

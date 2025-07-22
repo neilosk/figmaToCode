@@ -139,9 +139,9 @@ export class GeminiAPI {
     try {
       // Use Gemini 2.5 Flash for optimal performance
       const model = this.client.getGenerativeModel({ 
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         generationConfig: {
-          maxOutputTokens: 8192,
+          maxOutputTokens: 16000,
           temperature: 0.1,
         },
       });

@@ -1,23 +1,24 @@
-# Copy-Paste Preview Solution
+# Automated HTML Preview Generation
 
 ## Overview
 
-The copy-paste preview solution is the simplest and most reliable approach for component previewing. Instead of trying to render components in complex client-side environments, it generates a complete, self-contained HTML file that users can save and open locally.
+The automated HTML preview system is the simplest and most reliable approach for component previewing. Instead of trying to render components in complex client-side environments, it automatically generates complete, self-contained HTML files that users can directly open in their browser.
 
 ## How It Works
 
 ### 1. **User Flow**
 1. Generate a component with any AI provider (Claude, OpenAI, Gemini)
-2. Click "Copy HTML Preview" button
-3. Complete HTML file is copied to clipboard
-4. Save as `.html` file and open in browser
+2. Click "Generate HTML File" button
+3. HTML file is automatically created in project root
+4. Double-click the file to open in browser
 5. Component renders perfectly with all styling
 
 ### 2. **Technical Process**
 1. **Code Cleaning**: Remove imports, exports, TypeScript annotations
 2. **HTML Generation**: Create complete HTML document with React + dependencies
 3. **CSS Injection**: Include Tailwind CSS and component-specific styles
-4. **Error Handling**: Built-in error display with debug information
+4. **File Creation**: Automatically write HTML file to project root
+5. **Error Handling**: Built-in error display with debug information
 
 ## Key Benefits
 
@@ -40,10 +41,10 @@ The copy-paste preview solution is the simplest and most reliable approach for c
 - Uses standard CDN libraries
 
 ### ✅ **User Friendly**
-- Clear step-by-step instructions
+- One-click file generation
 - Professional preview presentation
 - Permanent files users can keep
-- Works offline once saved
+- Works offline once created
 
 ## Generated HTML Structure
 
@@ -124,17 +125,16 @@ The copy-paste preview solution is the simplest and most reliable approach for c
 ## Usage Instructions
 
 ### **For Users**
-1. Click "Copy HTML Preview" button
-2. The HTML is automatically copied to clipboard
-3. Open a text editor (VS Code, Notepad, etc.)
-4. Paste the HTML content
-5. Save as `component-preview.html`
-6. Double-click the file to open in browser
+1. Click "Generate HTML File" button
+2. HTML file is automatically created in project root
+3. Look for `[ComponentName]Preview.html` in your project directory
+4. Double-click the file to open in browser
+5. Component renders perfectly with all styling
 
 ### **For Developers**
 - API endpoint: `POST /api/copy-paste-preview`
 - Request: `{ code, componentName, styling, files }`
-- Response: `{ success, html, instructions }`
+- Response: `{ success, filename, filepath, instructions }`
 
 ## Comparison with Other Solutions
 
@@ -144,18 +144,19 @@ The copy-paste preview solution is the simplest and most reliable approach for c
 - ❌ Fragile: Breaks with code format changes
 - ❌ Maintenance: Requires constant updates
 
-### **vs Copy-Paste Solution**
+### **vs Automated HTML Generation**
 - ✅ Simple: ~100 lines of clean code
 - ✅ Reliable: Always works exactly the same
 - ✅ Robust: Handles all AI provider formats
 - ✅ Maintenance: No ongoing updates needed
+- ✅ Automated: One-click file generation
 
 ### **vs External Services (CodeSandbox/StackBlitz)**
 - ✅ No API limits or rate limiting
-- ✅ Works offline once saved
+- ✅ Works offline once created
 - ✅ No external dependencies
 - ✅ User owns the files
-- ❌ Requires manual save/open steps
+- ✅ Automated file creation (no manual steps)
 
 ## Testing
 

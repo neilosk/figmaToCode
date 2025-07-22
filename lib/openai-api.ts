@@ -44,8 +44,8 @@ export class OpenAIAPI {
 
     try {
       const response = await this.client.chat.completions.create({
-        model: 'gpt-4o',
-        max_tokens: 8000,
+        model: 'gpt-4.1-2025-04-14',
+        max_tokens: 32768,
         messages: [
           {
             role: 'user',

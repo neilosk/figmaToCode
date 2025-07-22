@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { writeFileSync } from 'fs';
+import path from 'path';
 
 /**
- * Copy-Paste Preview Solution
+ * Automated HTML Preview Generation
  * 
- * The simplest possible approach: give users a ready-to-paste
- * HTML file they can save and open locally.
+ * Automatically creates HTML preview files in the project root
+ * so users just need to open the generated file.
  */
 
 export async function POST(request: NextRequest) {
@@ -146,14 +148,29 @@ export async function POST(request: NextRequest) {
 </body>
 </html>`;
 
+    // Generate filename
+    const safeComponentName = componentName.replace(/[^a-zA-Z0-9]/g, '');
+    const filename = `${safeComponentName}Preview.html`;
+    const filepath = path.join(process.cwd(), filename);
+    
+    // Write the HTML file
+    try {
+      writeFileSync(filepath, html, 'utf8');
+      console.log(`✅ Generated preview file: ${filename}`);
+    } catch (writeError) {
+      console.error('Failed to write HTML file:', writeError);
+      throw new Error(`Failed to create HTML file: ${writeError instanceof Error ? writeError.message : 'Unknown error'}`);
+    }
+
     return NextResponse.json({
       success: true,
-      html,
+      filename,
+      filepath,
       instructions: [
-        '1. Copy the HTML code (already copied to clipboard)',
-        '2. Save it as a .html file (e.g., component-preview.html)',
-        '3. Open the file in your browser',
-        '4. Your component will render with perfect styling!'
+        `✅ HTML file created: ${filename}`,
+        '🔍 Look in your project root directory',
+        '🌐 Double-click the file to open in browser',
+        '🎉 Your component will render perfectly!'
       ]
     });
 
