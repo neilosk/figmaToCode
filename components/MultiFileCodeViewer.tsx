@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import CodeViewer from './CodeViewer';
-import { FileText, Code, Palette } from 'lucide-react';
+import { FileText, Code, Palette, Globe } from 'lucide-react';
 
 interface CodeFile {
   name: string;
@@ -41,9 +41,12 @@ export default function MultiFileCodeViewer({ files, title }: MultiFileCodeViewe
     switch (type.toLowerCase()) {
       case 'tsx':
       case 'ts':
+      case 'typescript':
       case 'jsx':
       case 'js':
         return <Code className="h-4 w-4" />;
+      case 'html':
+        return <Globe className="h-4 w-4" />;
       case 'css':
       case 'scss':
       case 'sass':
@@ -59,9 +62,12 @@ export default function MultiFileCodeViewer({ files, title }: MultiFileCodeViewe
       case 'jsx':
         return 'typescript';
       case 'ts':
+      case 'typescript':
         return 'typescript';
       case 'js':
         return 'javascript';
+      case 'html':
+        return 'html';
       case 'css':
         return 'css';
       case 'scss':

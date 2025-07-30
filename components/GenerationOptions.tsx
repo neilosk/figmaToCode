@@ -127,17 +127,21 @@ export default function GenerationOptions({
           Framework
         </label>
         <div className="grid grid-cols-3 gap-2">
-          {(['react', 'vue', 'angular'] as const).map((framework) => (
+          {([
+            { value: 'react', label: 'React' },
+            { value: 'vue', label: 'Vue' },
+            { value: 'angular', label: 'Angular 8' }
+          ] as const).map((framework) => (
             <button
-              key={framework}
-              onClick={() => updateOption('framework', framework)}
-              className={`p-2 text-center border rounded-lg transition-all capitalize ${
-                options.framework === framework
+              key={framework.value}
+              onClick={() => updateOption('framework', framework.value)}
+              className={`p-2 text-center border rounded-lg transition-all ${
+                options.framework === framework.value
                   ? 'border-blue-500 bg-blue-50 text-blue-700'
                   : 'border-slate-200 hover:border-slate-300'
               }`}
             >
-              {framework}
+              {framework.label}
             </button>
           ))}
         </div>
@@ -152,7 +156,11 @@ export default function GenerationOptions({
           {([
             { value: 'tailwind', label: 'Tailwind CSS', desc: 'Utility-first CSS framework' },
             { value: 'css', label: 'CSS Modules', desc: 'Scoped CSS with modules' },
-            { value: 'styled-components', label: 'Styled Components', desc: 'CSS-in-JS with styled-components' },
+            { 
+              value: 'styled-components', 
+              label: 'Styled Components', 
+              desc: options.framework === 'angular' ? 'Bootstrap 4.3 + Material 8 (Angular only)' : 'CSS-in-JS with styled-components'
+            },
           ] as const).map((styling) => (
             <button
               key={styling.value}
@@ -168,6 +176,18 @@ export default function GenerationOptions({
             </button>
           ))}
         </div>
+        
+        {/* Angular-specific styling notice */}
+        {options.framework === 'angular' && (
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="text-sm">
+              <div className="font-medium text-blue-800 mb-1">🅰️ Angular 8 Recommendation</div>
+              <div className="text-blue-700">
+                Select "Styled Components" to get Bootstrap 4.3 + Angular Material 8 integration with separate TypeScript, HTML, and SCSS files.
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Boolean Options */}
@@ -243,8 +263,12 @@ export default function GenerationOptions({
         <h4 className="font-medium text-slate-700 mb-2">Generation Preview:</h4>
         <ul className="space-y-1 text-slate-600">
           <li>• AI Provider: <span className="font-medium">{options.provider === 'claude' ? 'Claude AI' : options.provider === 'openai' ? 'OpenAI' : 'Gemini'}</span></li>
-          <li>• Framework: <span className="font-medium capitalize">{options.framework}</span></li>
-          <li>• Styling: <span className="font-medium">{options.styling === 'tailwind' ? 'Tailwind CSS' : options.styling === 'css' ? 'CSS Modules' : 'Styled Components'}</span></li>
+          <li>• Framework: <span className="font-medium">{options.framework === 'angular' ? 'Angular 8' : options.framework.charAt(0).toUpperCase() + options.framework.slice(1)}</span></li>
+          <li>• Styling: <span className="font-medium">{
+            options.styling === 'tailwind' ? 'Tailwind CSS' : 
+            options.styling === 'css' ? 'CSS Modules' : 
+            options.framework === 'angular' ? 'Bootstrap 4.3 + Material 8' : 'Styled Components'
+          }</span></li>
           <li>• Language: <span className="font-medium">{options.typescript ? 'TypeScript' : 'JavaScript'}</span></li>
           <li>• Type: <span className="font-medium capitalize">{generationType}</span></li>
           {generationType === 'page' && (

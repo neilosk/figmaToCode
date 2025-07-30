@@ -103,12 +103,13 @@ export async function POST(request: NextRequest) {
           allComponents.push(...findComponents(node));
         });
 
+        // If no components found, treat each node as a component
         if (allComponents.length === 0) {
-          return NextResponse.json(
-            { error: 'No components found in the provided nodes' },
-            { status: 400 }
-          );
+          console.log('⚠️  No components found, treating each node as a component');
+          allComponents.push(...nodes);
         }
+        
+        console.log(`🔄 Generating ${allComponents.length} components...`);
 
         // Generate code for each component
         const components = await apiClient.generateMultipleComponents(allComponents, options);
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
           type: 'multiple',
           components: components.map(comp => ({
             componentName: comp.componentName,
-            code: comp.files.find(f => f.type === 'tsx')?.content || '', // Keep backwards compatibility
+            code: comp.files.find(f => f.type === 'tsx' || f.type === 'typescript')?.content || '', // Angular compatibility
             files: comp.files,
           })),
         };

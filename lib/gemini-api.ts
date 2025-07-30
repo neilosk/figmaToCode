@@ -12,7 +12,7 @@ export class GeminiAPI {
   }
 
   /**
-   * Generate React component code from processed Figma node
+   * Generate component code from processed Figma node
    */
   async generateComponent(
     node: ProcessedNode,
@@ -32,29 +32,51 @@ export class GeminiAPI {
       responsive = true,
     } = options;
 
-    const prompt = this.buildComponentPrompt(node, {
-      framework,
-      styling,
-      typescript,
-      includeProps,
-      responsive,
-    });
+    const prompt = framework === 'angular' && styling === 'styled-components' ? 
+      this.buildAngularComponentPrompt(node, { typescript, responsive }) :
+      this.buildComponentPrompt(node, {
+        framework,
+        styling,
+        typescript,
+        includeProps,
+        responsive,
+      });
 
     try {
       // Use Gemini 2.5 Flash for optimal performance
+      // Adjust token limits for Angular generation
+      const maxTokens = framework === 'angular' && styling === 'styled-components' ?  32768 : 32768;
       const model = this.client.getGenerativeModel({ 
         model: 'gemini-2.5-flash',
         generationConfig: {
-          maxOutputTokens: 32768,
+          maxOutputTokens: maxTokens,
           temperature: 0.1,
         },
       });
 
-      const result = await model.generateContent(prompt);
+      console.log(`🔥 Generating ${framework} component with Gemini...`);
+      console.log(`📏 Prompt length: ${prompt.length} chars, Max tokens: ${maxTokens}`);
+      
+      // Add timeout wrapper for long-running requests
+      const timeoutSeconds = framework === 'angular' && styling === 'styled-components' ? 180 : 120;
+      const generateWithTimeout = Promise.race([
+        model.generateContent(prompt),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error(`Gemini API timeout after ${timeoutSeconds} seconds. Try again or switch to a different AI provider.`)), timeoutSeconds * 1000)
+        )
+      ]);
+
+      const result = await generateWithTimeout as any;
       const response = result.response;
       const content = response.text();
+      
+      console.log(`✅ Gemini generation completed, response length: ${content?.length || 0} chars`);
 
       if (content) {
+        // Handle Angular specifically
+        if (framework === 'angular' && styling === 'styled-components') {
+          return this.extractAngularFilesFromResponse(content, node.componentName || node.name);
+        }
         return this.extractMultipleFilesFromResponse(content, node.componentName || node.name, styling);
       }
 
@@ -90,20 +112,37 @@ export class GeminiAPI {
     } = {}
   ): Promise<{ componentName: string; files: { name: string; content: string; type: string }[] }[]> {
     const results: { componentName: string; files: { name: string; content: string; type: string }[] }[] = [];
+    const { framework = 'react', styling = 'tailwind' } = options;
 
-    for (const node of nodes) {
+    console.log(`🔄 Starting multiple component generation: ${nodes.length} components (${framework}/${styling})`);
+
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
       try {
+        console.log(`📦 Generating component ${i + 1}/${nodes.length}: ${node.name}`);
         const generated = await this.generateComponent(node, options);
         results.push({
           componentName: node.componentName || node.name,
           files: generated.files,
         });
+        console.log(`✅ Component ${i + 1}/${nodes.length} completed: ${node.name}`);
       } catch (error) {
-        console.error(`Failed to generate component for ${node.name}:`, error);
+        console.error(`❌ Failed to generate component ${i + 1}/${nodes.length} (${node.name}):`, error);
         // Continue with other components even if one fails
+        
+        // Add a minimal fallback component for failed generations
+        results.push({
+          componentName: node.componentName || node.name,
+          files: [{
+            name: `${(node.componentName || node.name).replace(/[^a-zA-Z0-9]/g, '')}.error.txt`,
+            content: `Error generating component: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            type: 'text'
+          }]
+        });
       }
     }
 
+    console.log(`🎯 Multiple component generation completed: ${results.length}/${nodes.length} successful`);
     return results;
   }
 
@@ -141,7 +180,7 @@ export class GeminiAPI {
       const model = this.client.getGenerativeModel({ 
         model: 'gemini-2.5-flash',
         generationConfig: {
-          maxOutputTokens: 16000,
+          maxOutputTokens:  32768,
           temperature: 0.1,
         },
       });
@@ -716,8 +755,8 @@ Generate the complete website now with EXACT fidelity to all frame designs:`;
    * Extract code from response
    */
   private extractCodeFromResponse(response: string): string {
-    // Remove markdown code blocks if present
-    const codeBlockRegex = /```(?:typescript|tsx|javascript|jsx)?\n?([\s\S]*?)\n?```/;
+    // Remove markdown code blocks if present - expanded to handle Angular file types
+    const codeBlockRegex = /```(?:typescript|tsx|javascript|jsx|ts|html|scss|css)?\n?([\s\S]*?)\n?```/;
     const match = response.match(codeBlockRegex);
     
     if (match) {
@@ -796,6 +835,153 @@ Generate the complete website now with EXACT fidelity to all frame designs:`;
       
       return {
         tsx: tsxCode,
+        files
+      };
+    }
+  }
+
+  /**
+   * Build Angular-specific prompt with Bootstrap 4.3 and Material 8
+   */
+  private buildAngularComponentPrompt(
+    node: ProcessedNode,
+    _options: {
+      typescript: boolean;
+      responsive: boolean;
+    }
+  ): string {
+    const componentName = (node.componentName || node.name).replace(/[^a-zA-Z0-9]/g, '');
+    
+    return `Create Angular 8 component: ${componentName}
+
+DESIGN INFO:
+Name: ${node.name}
+Size: ${node.styles.width}x${node.styles.height}px
+Background: ${node.styles.backgroundColor || 'transparent'}
+Text: ${this.extractAllTextWithPosition(node).map(t => t.content).join(', ') || 'No text'}
+
+REQUIREMENTS:
+- Angular 8 + Bootstrap 4.3 + Material 8
+- TypeScript component with proper imports
+- 3 separate files: .ts, .html, .scss
+- Use Bootstrap grid and Material components
+
+OUTPUT 3 FILES:
+
+--- TYPESCRIPT FILE ---
+\`\`\`typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-${componentName.toLowerCase()}',
+  templateUrl: './${componentName.toLowerCase()}.component.html',
+  styleUrls: ['./${componentName.toLowerCase()}.component.scss']
+})
+export class ${componentName}Component {
+  constructor() { }
+}
+\`\`\`
+
+--- HTML FILE ---
+\`\`\`html
+<div class="container ${componentName.toLowerCase()}-container">
+  <!-- Bootstrap + Material template here -->
+</div>
+\`\`\`
+
+--- SCSS FILE ---
+\`\`\`scss
+.${componentName.toLowerCase()}-container {
+  /* Component styles */
+}
+\`\`\``;
+  }
+
+  /**
+   * Extract Angular files from response (TypeScript, HTML, SCSS)
+   */
+  private extractAngularFilesFromResponse(
+    response: string, 
+    componentName: string
+  ): { tsx: string; css?: string; files: { name: string; content: string; type: string }[] } {
+    const files: { name: string; content: string; type: string }[] = [];
+    const cleanComponentName = componentName.replace(/[^a-zA-Z0-9]/g, '');
+    
+    console.log(`🔍 Extracting Angular files for component: ${cleanComponentName}`);
+    console.log(`📄 Response length: ${response.length} chars`);
+    console.log(`📋 Response preview: ${response.substring(0, 200)}...`);
+    
+    try {
+      // Extract TypeScript file
+      const tsMatch = response.match(/--- TYPESCRIPT FILE ---\s*([\s\S]*?)(?=--- \w+ FILE ---|$)/);
+      // Extract HTML file  
+      const htmlMatch = response.match(/--- HTML FILE ---\s*([\s\S]*?)(?=--- \w+ FILE ---|$)/);
+      // Extract SCSS file
+      const scssMatch = response.match(/--- SCSS FILE ---\s*([\s\S]*?)(?=--- \w+ FILE ---|$)/);
+      
+      console.log(`🔍 File matches found: TS=${!!tsMatch}, HTML=${!!htmlMatch}, SCSS=${!!scssMatch}`);
+      
+      let tsCode = '';
+      let htmlCode = '';
+      let scssCode = '';
+      
+      if (tsMatch) {
+        tsCode = this.extractCodeFromResponse(tsMatch[1].trim());
+        console.log(`✅ TypeScript code extracted: ${tsCode.length} chars`);
+        files.push({
+          name: `${cleanComponentName.toLowerCase()}.component.ts`,
+          content: tsCode,
+          type: 'typescript'
+        });
+      } else {
+        console.log(`❌ No TypeScript file section found in response`);
+      }
+      
+      if (htmlMatch) {
+        htmlCode = this.extractCodeFromResponse(htmlMatch[1].trim());
+        console.log(`✅ HTML code extracted: ${htmlCode.length} chars`);
+        files.push({
+          name: `${cleanComponentName.toLowerCase()}.component.html`,
+          content: htmlCode,
+          type: 'html'
+        });
+      } else {
+        console.log(`❌ No HTML file section found in response`);
+      }
+      
+      if (scssMatch) {
+        scssCode = this.extractCodeFromResponse(scssMatch[1].trim());
+        console.log(`✅ SCSS code extracted: ${scssCode.length} chars`);
+        files.push({
+          name: `${cleanComponentName.toLowerCase()}.component.scss`,
+          content: scssCode,
+          type: 'scss'
+        });
+      } else {
+        console.log(`❌ No SCSS file section found in response`);
+      }
+
+      console.log(`📁 Total files extracted: ${files.length}`);
+
+      // For backward compatibility, return the TypeScript content as 'tsx'
+      return {
+        tsx: tsCode,
+        css: scssCode || undefined,
+        files
+      };
+    } catch (error) {
+      console.error('❌ Error extracting Angular files from response:', error);
+      console.log('🔧 Using emergency fallback');
+      // Emergency fallback
+      const fallbackCode = response;
+      files.push({
+        name: `${cleanComponentName.toLowerCase()}.component.ts`,
+        content: fallbackCode,
+        type: 'typescript'
+      });
+      
+      return {
+        tsx: fallbackCode,
         files
       };
     }

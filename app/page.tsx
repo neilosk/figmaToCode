@@ -7,6 +7,7 @@ import CodeViewer from '../components/CodeViewer';
 import MultiFileCodeViewer from '../components/MultiFileCodeViewer';
 import FigmaInput from '../components/FigmaInput';
 import FrameSelector from '../components/FrameSelector';
+import SmartFrameSelector from '../components/SmartFrameSelector';
 import GenerationOptions from '../components/GenerationOptions';
 
 interface FigmaData {
@@ -32,6 +33,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [useSmartSelector, setUseSmartSelector] = useState(true);
   
   // Generation options
   const [generationType, setGenerationType] = useState<'component' | 'page' | 'multiple'>('component');
@@ -209,6 +211,52 @@ The HTML file has been automatically created in your project root. Just double-c
     }
   };
 
+  const handleOpenFullPreview = async (code: string, frameName?: string, files?: Array<{ name: string; content: string; type: string }>) => {
+    try {
+      console.log('🚀 Opening full preview in dedicated page...');
+      
+      // For Angular components, handle file structure differently
+      const isAngularComponent = files?.some(f => f.type === 'typescript' || f.type === 'html' || f.type === 'scss');
+      
+      if (isAngularComponent) {
+        // For Angular, create a preview of the main component file
+        const tsFile = files?.find(f => f.type === 'typescript');
+        const htmlFile = files?.find(f => f.type === 'html');
+        
+        if (tsFile && htmlFile) {
+          // Create a simplified preview that shows the component structure
+          const previewCode = `<!-- Angular Component Preview -->
+<div class="angular-preview">
+  <h2>Angular Component: ${frameName || 'Component'}</h2>
+  <div class="file-structure">
+    ${files?.map(f => `<div class="file">${f.name} (${f.type})</div>`).join('')}
+  </div>
+  <div class="component-preview">
+    ${htmlFile.content}
+  </div>
+</div>`;
+          
+          const blob = new Blob([previewCode], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          setSuccess('Angular component preview opened in new tab');
+          return;
+        }
+      }
+      
+      // Fallback for non-Angular components
+      const cleanCode = code.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '').replace(/style="[^"]*"/g, '').trim();
+      const blob = new Blob([cleanCode], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setSuccess('Preview opened in new tab');
+      
+    } catch (error) {
+      console.error('🚀 Preview failed:', error);
+      setError('Failed to open preview: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
+
   const handleCopyCode = async (code: string) => {
     try {
       await navigator.clipboard.writeText(code);
@@ -223,10 +271,10 @@ The HTML file has been automatically created in your project root. Just double-c
       {/* Header Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-slate-800 mb-4">
-          Turn Figma Designs into React Code
+          Turn Figma Designs into Angular Code
         </h1>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-          Paste your Figma URL, select frames, and let AI generate production-ready React components instantly.
+          Paste your Figma URL, select frames, and let AI generate production-ready Angular components instantly.
         </p>
       </div>
 
@@ -261,15 +309,32 @@ The HTML file has been automatically created in your project root. Just double-c
           {/* Frame Selection */}
           {figmaData && (
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-              <h2 className="text-xl font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <Eye className="h-5 w-5" />
-                Step 2: Select Frames
-              </h2>
-              <FrameSelector
-                frames={figmaData.frames}
-                onSelectionChange={handleFrameSelection}
-                selectedFrames={selectedFrames}
-              />
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Step 2: Select Components
+                </h2>
+                <button
+                  onClick={() => setUseSmartSelector(!useSmartSelector)}
+                  className="text-sm px-3 py-1 rounded border border-slate-300 hover:bg-slate-50 transition-colors"
+                >
+                  {useSmartSelector ? 'Smart View' : 'Basic View'}
+                </button>
+              </div>
+              
+              {useSmartSelector ? (
+                <SmartFrameSelector
+                  frames={figmaData.frames}
+                  onSelectionChange={handleFrameSelection}
+                  selectedFrames={selectedFrames}
+                />
+              ) : (
+                <FrameSelector
+                  frames={figmaData.frames}
+                  onSelectionChange={handleFrameSelection}
+                  selectedFrames={selectedFrames}
+                />
+              )}
             </div>
           )}
 
@@ -583,16 +648,37 @@ export default function TestComponent() {
 
           {/* Instructions */}
           {!figmaData && (
-            <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
-              <h3 className="text-lg font-semibold text-blue-800 mb-3">How to get started:</h3>
-              <ol className="list-decimal list-inside space-y-2 text-blue-700">
-                <li>Get your Figma access token from Figma Settings → Account → Personal Access Tokens</li>
-                <li>Copy the URL of your Figma file OR use format: https://api.figma.com/v1/files/YOUR_FILE_KEY</li>
-                <li>Paste both above and click "Load File"</li>
-                <li>Select the frames you want to convert</li>
-                <li>Choose your generation options</li>
-                <li>Click "Generate Code" and get your React components!</li>
-              </ol>
+            <div className="space-y-4">
+              <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+                <h3 className="text-lg font-semibold text-blue-800 mb-3">How to get started:</h3>
+                <ol className="list-decimal list-inside space-y-2 text-blue-700">
+                  <li>Get your Figma access token from Figma Settings → Account → Personal Access Tokens</li>
+                  <li>Copy the URL of your Figma file OR use format: https://api.figma.com/v1/files/YOUR_FILE_KEY</li>
+                  <li>Paste both above and click "Load File"</li>
+                  <li>Select the components you want to convert</li>
+                  <li>Choose your generation options</li>
+                  <li>Click "Generate Code" and get your components!</li>
+                </ol>
+              </div>
+              
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+                <h3 className="text-lg font-semibold text-purple-800 mb-3 flex items-center gap-2">
+                  🅰️ Angular 8 + Bootstrap 4.3 + Material 8
+                </h3>
+                <div className="text-purple-700 space-y-2">
+                  <p className="font-medium">For best Angular results:</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>Use <strong>Smart View</strong> to see meaningful components</li>
+                    <li>Select <strong>one component at a time</strong> (Single Component mode)</li>
+                    <li>Choose <strong>Gemini → Angular 8 → Styled Components</strong></li>
+                    <li>Get 3 clean files: <code>.ts</code>, <code>.html</code>, <code>.scss</code></li>
+                    <li>Each component includes Bootstrap grid + Material UI elements</li>
+                  </ul>
+                  <p className="text-sm bg-white/50 rounded px-3 py-2 mt-3">
+                    💡 <strong>Tip:</strong> Generate 5-10 key components individually, then combine them into your Angular app!
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
