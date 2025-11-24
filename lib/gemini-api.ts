@@ -38,7 +38,7 @@ export class GeminiAPI {
         framework,
         styling,
         typescript,
-        includeProps,
+        includeProps, 
         responsive,
       });
 
