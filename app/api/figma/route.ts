@@ -2,7 +2,7 @@
 
 
 import { NextRequest, NextResponse } from 'next/server';
-import { processNode } from '../../../utils/figma';
+import { processNode, extractAllFrames } from '../../../utils/figma';
 
 
 export async function GET() {
@@ -101,20 +101,28 @@ export async function POST(request: NextRequest) {
     const figmaData = await figmaResponse.json();
     console.log('📝 Success! File name:', figmaData.name);
 
-    // Simple processing - just get the frames without complex processing for now
-    const pages = figmaData.document?.children || [];
-    let allFrames: any[] = [];
+    // Process the entire document first
+    const processedDocument = processNode(figmaData.document);
     
-    // Extract frames from all pages
+    // Extract all frames from the processed document (including nested frames)
+    const allFrames = extractAllFrames(processedDocument);
+    
+    // Also get top-level frames the old way for backwards compatibility
+    const pages = figmaData.document?.children || [];
+    let topLevelFrames: any[] = [];
+    
     pages.forEach((page: any) => {
       if (page.type === 'CANVAS' && page.children) {
         const pageFrames = page.children.filter((child: any) => child.type === 'FRAME');
-        allFrames.push(...pageFrames);
+        topLevelFrames.push(...pageFrames);
       }
     });
 
-    // Convert to our comprehensive format using processNode
-    const processedFrames = allFrames.map((frame: any) => processNode(frame));
+    console.log('📝 Extracted frames:', {
+      topLevelFrames: topLevelFrames.length,
+      allNestedFrames: allFrames.length,
+      frameNames: allFrames.map(f => f.name)
+    });
 
     return NextResponse.json({
       success: true,
@@ -123,8 +131,8 @@ export async function POST(request: NextRequest) {
         fileKey,
         lastModified: figmaData.lastModified,
         thumbnailUrl: figmaData.thumbnailUrl,
-        frames: processedFrames,
-        totalFrames: processedFrames.length,
+        frames: allFrames,
+        totalFrames: allFrames.length,
         rawDocument: figmaData.document, // Include raw data for debugging
       },
     });

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ProcessedNode } from '../types/figma';
 import { ComponentAnalyzer, ComponentCategory, AnalyzedComponent } from '../utils/component-analyzer';
+import { countAllChildren } from '../utils/figma';
 import { 
   Frame, 
   Layers, 
@@ -36,7 +37,7 @@ export default function SmartFrameSelector({
 }: SmartFrameSelectorProps) {
   const [analyzedComponents, setAnalyzedComponents] = useState<AnalyzedComponent[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<Set<ComponentCategory>>(new Set());
-  const [viewMode, setViewMode] = useState<'recommended' | 'all' | 'categories'>('recommended');
+  const [viewMode, setViewMode] = useState<'frames' | 'recommended' | 'all' | 'categories'>('frames');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Analyze components when frames change
@@ -132,6 +133,18 @@ export default function SmartFrameSelector({
 
   const getFilteredComponents = () => {
     switch (viewMode) {
+      case 'frames':
+        return frames.map(frame => ({
+          node: frame,
+          category: ComponentCategory.LAYOUT,
+          cleanName: frame.componentName || frame.name,
+          meaningfulName: frame.framePath || frame.name,
+          description: `${frame.frameDepth ? '└'.repeat(frame.frameDepth) + ' ' : ''}Frame with ${countAllChildren(frame)} total elements`,
+          complexity: 'medium' as const,
+          recommendedForGeneration: true,
+          childCount: countAllChildren(frame),
+          hasInteractivity: false
+        }));
       case 'recommended':
         return analyzedComponents.filter(comp => comp.recommendedForGeneration);
       case 'all':
@@ -139,7 +152,17 @@ export default function SmartFrameSelector({
       case 'categories':
         return analyzedComponents;
       default:
-        return analyzedComponents;
+        return frames.map(frame => ({
+          node: frame,
+          category: ComponentCategory.LAYOUT,
+          cleanName: frame.componentName || frame.name,
+          meaningfulName: frame.name,
+          description: `Frame component with ${countAllChildren(frame)} total elements`,
+          complexity: 'medium' as const,
+          recommendedForGeneration: true,
+          childCount: countAllChildren(frame),
+          hasInteractivity: false
+        }));
     }
   };
 
@@ -167,6 +190,69 @@ export default function SmartFrameSelector({
   const filteredComponents = getFilteredComponents();
   const recommendedCount = analyzedComponents.filter(c => c.recommendedForGeneration).length;
   
+  // Banner component based on view mode
+  const renderBanner = () => {
+    if (viewMode === 'frames') {
+      return (
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="bg-green-500 text-white rounded-full p-1">
+              <Frame className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="font-medium text-green-800 mb-1">📄 Figma Frame View</div>
+              <div className="text-sm text-green-700 mb-2">
+                Showing direct frames from your Figma file. Each frame represents a complete component or screen.
+                <br />Choose <strong>one frame at a time</strong> for Angular generation.
+              </div>
+              <div className="text-xs bg-white rounded px-2 py-1 font-mono text-green-800">
+                Select Frame → Single Component → Gemini → Angular 8
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (viewMode === 'categories') {
+      return (
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="bg-purple-500 text-white rounded-full p-1">
+              <Target className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="font-medium text-purple-800 mb-1">📁 Category View</div>
+              <div className="text-sm text-purple-700 mb-2">
+                Components organized by functionality. Select <strong>one meaningful component at a time</strong> for Angular generation.
+              </div>
+              <div className="text-xs bg-white rounded px-2 py-1 font-mono text-purple-800">
+                Single Component → Gemini → Angular 8 → Styled Components
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="bg-blue-500 text-white rounded-full p-1">
+              <Target className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="font-medium text-blue-800 mb-1">🅰️ Angular Generation Strategy</div>
+              <div className="text-sm text-blue-700 mb-2">
+                For best results, select <strong>one meaningful component at a time</strong> and use:
+              </div>
+              <div className="text-xs bg-white rounded px-2 py-1 font-mono text-blue-800">
+                Single Component → Gemini → Angular 8 → Styled Components
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
+  
   if (viewMode === 'categories') {
     const groupedComponents = ComponentAnalyzer.groupByCategory(filteredComponents);
     
@@ -187,9 +273,10 @@ export default function SmartFrameSelector({
               onChange={(e) => setViewMode(e.target.value as any)}
               className="text-sm border border-slate-300 rounded px-2 py-1"
             >
-              <option value="recommended">Recommended ({recommendedCount})</option>
-              <option value="all">All Components ({analyzedComponents.length})</option>
-              <option value="categories">By Category</option>
+              <option value="frames">📄 Figma Frames ({frames.length})</option>
+              <option value="recommended">⭐ Recommended ({recommendedCount})</option>
+              <option value="all">🔍 All Components ({analyzedComponents.length})</option>
+              <option value="categories">📁 By Category</option>
             </select>
             
             {recommendedCount > 0 && (
@@ -203,23 +290,7 @@ export default function SmartFrameSelector({
           </div>
         </div>
 
-        {/* Angular Recommendation Banner */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <div className="bg-blue-500 text-white rounded-full p-1">
-              <Target className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="font-medium text-blue-800 mb-1">🅰️ Angular Generation Strategy</div>
-              <div className="text-sm text-blue-700 mb-2">
-                For best results, select <strong>one meaningful component at a time</strong> and use:
-              </div>
-              <div className="text-xs bg-white rounded px-2 py-1 font-mono text-blue-800">
-                Single Component → Gemini → Angular 8 → Styled Components
-              </div>
-            </div>
-          </div>
-        </div>
+        {renderBanner()}
 
         {/* Categories */}
         <div className="space-y-3">
@@ -334,7 +405,8 @@ export default function SmartFrameSelector({
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-purple-600" />
           <span className="font-medium text-slate-700">
-            {viewMode === 'recommended' ? 'Recommended Components' : 'All Components'}
+            {viewMode === 'frames' ? 'Figma Frames' : 
+             viewMode === 'recommended' ? 'Recommended Components' : 'All Components'}
           </span>
           <span className="text-sm text-slate-500">({filteredComponents.length})</span>
         </div>
@@ -345,12 +417,15 @@ export default function SmartFrameSelector({
             onChange={(e) => setViewMode(e.target.value as any)}
             className="text-sm border border-slate-300 rounded px-2 py-1"
           >
-            <option value="recommended">Recommended ({recommendedCount})</option>
-            <option value="all">All Components ({analyzedComponents.length})</option>
-            <option value="categories">By Category</option>
+            <option value="frames">📄 Figma Frames ({frames.length})</option>
+            <option value="recommended">⭐ Recommended ({recommendedCount})</option>
+            <option value="all">🔍 All Components ({analyzedComponents.length})</option>
+            <option value="categories">📁 By Category</option>
           </select>
         </div>
       </div>
+
+      {renderBanner()}
 
       {/* Component List */}
       <div className="space-y-3 max-h-96 overflow-y-auto">

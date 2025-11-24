@@ -271,7 +271,7 @@ The HTML file has been automatically created in your project root. Just double-c
       {/* Header Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-slate-800 mb-4">
-          Turn Figma Designs into Angular Code
+          Turn Figma Designs into FrontEnd Code
         </h1>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
           Paste your Figma URL, select frames, and let AI generate production-ready Angular components instantly.

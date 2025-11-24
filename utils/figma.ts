@@ -220,8 +220,11 @@ export function processNode(node: FigmaNode): ProcessedNode {
     isComponent: shouldTreatAsComponent(node),
   };
 
-  // Add component name if it should be treated as a component
-  if (processed.isComponent) {
+  // For frames, always mark as component and use the frame name as component name
+  if (node.type === 'FRAME') {
+    processed.isComponent = true;
+    processed.componentName = generateComponentName(node.name);
+  } else if (processed.isComponent) {
     processed.componentName = generateComponentName(node.name);
   }
 
@@ -417,6 +420,64 @@ export function analyzeContentType(node: ProcessedNode): string {
   }
   
   return 'content';
+}
+
+/**
+ * Count all nested children in a node tree
+ */
+export function countAllChildren(node: ProcessedNode): number {
+  let count = 0;
+  
+  if (node.children && node.children.length > 0) {
+    count += node.children.length;
+    // Recursively count nested children
+    node.children.forEach(child => {
+      count += countAllChildren(child);
+    });
+  }
+  
+  return count;
+}
+
+/**
+ * Extract all frames from a node tree, including nested frames
+ */
+export function extractAllFrames(node: ProcessedNode, parentPath: string = ''): ProcessedNode[] {
+  const frames: ProcessedNode[] = [];
+  
+  // If this node is a frame, include it with enhanced information
+  if (node.type === 'FRAME') {
+    const frameCopy = { ...node };
+    
+    // Add path information for better identification
+    const currentPath = parentPath ? `${parentPath} > ${node.name}` : node.name;
+    frameCopy.framePath = currentPath;
+    
+    // Enhance component name to be more descriptive
+    if (node.name.startsWith('Frame ')) {
+      frameCopy.componentName = `Frame${node.name.replace('Frame ', '')}Component`;
+    } else {
+      frameCopy.componentName = generateComponentName(node.name);
+    }
+    
+    // Add depth level for UI organization
+    frameCopy.frameDepth = parentPath.split(' > ').length;
+    
+    frames.push(frameCopy);
+  }
+  
+  // Recursively search children for more frames
+  if (node.children && node.children.length > 0) {
+    const currentPath = node.type === 'FRAME' ? 
+      (parentPath ? `${parentPath} > ${node.name}` : node.name) : 
+      parentPath;
+      
+    node.children.forEach(child => {
+      frames.push(...extractAllFrames(child, currentPath));
+    });
+  }
+  
+  return frames;
 }
 
 /**

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ProcessedNode } from '../types/figma';
+import { countAllChildren } from '../utils/figma';
 import { Frame, Layers, Check } from 'lucide-react';
 
 interface FrameSelectorProps {
@@ -50,7 +51,9 @@ export default function FrameSelector({ frames, selectedFrames, onSelectionChang
   };
 
   const getChildrenCount = (frame: ProcessedNode) => {
-    return frame.children?.length || 0;
+    const directChildren = frame.children?.length || 0;
+    const totalChildren = countAllChildren(frame);
+    return { direct: directChildren, total: totalChildren };
   };
 
   if (frames.length === 0) {
@@ -120,7 +123,7 @@ export default function FrameSelector({ frames, selectedFrames, onSelectionChang
                   </div>
                   
                   <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
-                    <span>{getChildrenCount(frame)} elements</span>
+                    <span>{getChildrenCount(frame).total} elements total ({getChildrenCount(frame).direct} direct)</span>
                     {frame.styles?.backgroundColor && (
                       <div className="flex items-center gap-1">
                         <div
