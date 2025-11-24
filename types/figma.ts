@@ -263,4 +263,6 @@ export interface ProcessedNode {
   content?: string; // For text nodes
   isComponent?: boolean;
   componentName?: string;
+  framePath?: string; // Full path showing parent hierarchy
+  frameDepth?: number; // Nesting depth level
 }
